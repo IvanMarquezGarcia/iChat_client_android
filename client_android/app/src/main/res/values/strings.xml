@@ -1,3 +1,22 @@
 <resources>
     <string name="app_name">iChat_android</string>
+
+    <!-- LOGIN AND REGISTER STRINGS -->
+    <string name="es_full_name">Nombre completo</string>
+    <string name="es_username">Nombre de usuario</string>
+    <string name="es_password">Contraseña</string>
+    <string name="es_confirm_password">Confirma la contraseña</string>
+    <string name="es_login">Iniciar sesión</string>
+    <string name="es_register">¿Aún no te has registrado?</string>
+
+    <string name="en_full_name">Full name</string>
+    <string name="en_username">Username</string>
+    <string name="en_password">Password</string>
+    <string name="en_confirm_password">Confirm the password</string>
+    <string name="en_login">Log in</string>
+    <string name="en_register">Not registered yet?</string>
+
+
+
+    <!-- CHAT STRINGS -->
 </resources>
