@@ -11,6 +11,7 @@ import android.os.Parcelable;
 import android.os.StrictMode;
 import android.view.View;
 
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -36,9 +37,11 @@ public class LoginActivity extends AppCompatActivity {
 
     private EditText username_edittext;
     private EditText password_edittext;
+    private EditText dev_host;
     private ImageButton loggin_button;
     private TextView register_textview;
     private TextView error_text;
+    private Button dev_button;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +54,8 @@ public class LoginActivity extends AppCompatActivity {
         loggin_button = findViewById(R.id.login_imageButton);
         register_textview = findViewById(R.id.login_register_textView);
         error_text = findViewById(R.id.login_error_textView);
+        dev_button = findViewById(R.id.login_dev_button);
+        dev_host = findViewById(R.id.login_host_edittext);
     }
 
     public void open_register(View view) {
@@ -99,7 +104,11 @@ public class LoginActivity extends AppCompatActivity {
                 new Thread(() -> {
                     try {
                         // for the lambda capturing standard //
-                        Socket socket = new Socket("192.168.1.50", puerto);
+                        String host = "192.168.1.50";
+                        if (dev_host.getVisibility() == View.VISIBLE)
+                            host = dev_host.getText().toString().trim();
+
+                        Socket socket = new Socket(host, puerto);
 
                         DataOutputStream output = new DataOutputStream(socket.getOutputStream());
 
@@ -138,7 +147,7 @@ public class LoginActivity extends AppCompatActivity {
                         String errorMsg = "Error al conectar";
 
                         System.out.println("-----------------------------------------------------");
-                        //ce.printStackTrace();
+                        ce.printStackTrace();
                         System.out.println(errorMsg);
                         System.out.println("-----------------------------------------------------");
 
@@ -182,6 +191,14 @@ public class LoginActivity extends AppCompatActivity {
             error_text.setText("Nombre o contraseña inválidos");
             error_text.setVisibility(View.VISIBLE);
         }
+    }
+
+
+    public void activate_dev(View view) {
+        if (dev_host.getVisibility() == View.VISIBLE)
+            dev_host.setVisibility(View.INVISIBLE);
+        else
+            dev_host.setVisibility(View.VISIBLE);
     }
 
 
