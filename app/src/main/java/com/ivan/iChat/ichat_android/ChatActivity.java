@@ -1,6 +1,8 @@
 package com.ivan.iChat.ichat_android;
 
 
+import static com.ivan.iChat.ichat_android.utils.Constants.STATUS_CONNECTED;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -20,10 +22,6 @@ import com.ivan.iChat.ichat_android.model.SingletonSocket;
 
 
 public class ChatActivity extends AppCompatActivity {
-
-    private final int CONNECTED = 1;
-    private final int DISCONNECTED = 0;
-    private final int ERROR = -1;
 
     private int connectionStatus;
     private Socket socket;
@@ -48,7 +46,7 @@ public class ChatActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        connectionStatus = CONNECTED;
+        connectionStatus = STATUS_CONNECTED;
         error_text = findViewById(R.id.chat_error_textview);
         input = findViewById(R.id.chat_input_edittext);
         mssgsList = findViewById(R.id.chat_mssgs_recyclerview);
@@ -93,7 +91,7 @@ public class ChatActivity extends AppCompatActivity {
 
     public void send(View view) {
         error_text.setVisibility(View.INVISIBLE);
-        if (connectionStatus == CONNECTED) {
+        if (connectionStatus == STATUS_CONNECTED) {
             String mssg = input.getText().toString().trim();
 
             if (mssg.length() > 0) {

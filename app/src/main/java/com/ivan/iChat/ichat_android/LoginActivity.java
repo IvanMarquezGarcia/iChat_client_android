@@ -1,14 +1,17 @@
 package com.ivan.iChat.ichat_android;
 
 
+/*import static com.ivan.iChat.ichat_android.utils.Constants.STATUS_CONNECTED;
+import static com.ivan.iChat.ichat_android.utils.Constants.STATUS_DISCONNECTED;
+import static com.ivan.iChat.ichat_android.utils.Constants.STATUS_ERROR;*/
+import static com.ivan.iChat.ichat_android.utils.Constants.*;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 
 import android.os.Bundle;
 
-import android.os.Parcelable;
-import android.os.StrictMode;
 import android.view.View;
 
 import android.widget.Button;
@@ -30,10 +33,6 @@ import java.util.HashMap;
 
 
 public class LoginActivity extends AppCompatActivity {
-
-    private final int CONNECTED = 1;
-    private final int DISCONNECTED = 0;
-    private final int ERROR = -1;
 
     private EditText username_edittext;
     private EditText password_edittext;
@@ -67,6 +66,13 @@ public class LoginActivity extends AppCompatActivity {
         HashMap<String, Boolean> checks = new HashMap<String, Boolean>();
         checks.put("username", true);
         checks.put("password", true);
+
+        if (username_edittext.getText().toString().trim().length() <= 0)
+            checks.put("username", false);
+
+        if (username_edittext.getText().toString().trim().length() <= 0)
+            checks.put("password", false);
+
         /*
         for logup
             username requirements:
@@ -89,7 +95,10 @@ public class LoginActivity extends AppCompatActivity {
 			Conectar con el servidor.
 	 */
     public void tryConnection(View view) {
-        error_text.setVisibility(View.INVISIBLE);
+        error_text.setText("Intentando conectar con el servidor...");
+        error_text.setTextColor(getResources().getColor(R.color.gold_light, null));
+        error_text.setVisibility(View.VISIBLE);
+
 
         HashMap<String, Boolean> checks = checkInput();
 
@@ -102,6 +111,8 @@ public class LoginActivity extends AppCompatActivity {
             // es un puerto registrado
             if (puerto > 1024 && puerto < 49151) {
                 new Thread(() -> {
+                    String errorMsg = "";
+                    Exception e = null;
                     try {
                         // for the lambda capturing standard //
                         String host = "192.168.1.50";
@@ -125,7 +136,7 @@ public class LoginActivity extends AppCompatActivity {
 
                         System.out.println("-------" + username + "-------");
 
-                        if (checkTry(socket) == CONNECTED) {
+                        if (checkTry(socket) == STATUS_CONNECTED) {
                             Intent i = new Intent(this, ChatActivity.class);
                             i.putExtra("username", username);
                             SingletonSocket.setInstance(socket);
@@ -133,63 +144,61 @@ public class LoginActivity extends AppCompatActivity {
                         }
                     }
                     catch (UnknownHostException uhe) {
-                        String errorMsg = "Host desconocido";
-
-                        System.out.println("-----------------------------------------------------");
-                        //uhe.printStackTrace();
-                        System.out.println(errorMsg);
-                        System.out.println("-----------------------------------------------------");
-
-                        /*error_text.setText(errorMsg);
-                        error_text.setVisibility(View.VISIBLE);*/
+                        errorMsg = "Host desconocido";
+                        e = uhe;
                     }
                     catch (ConnectException ce) {
-                        String errorMsg = "Error al conectar";
-
-                        System.out.println("-----------------------------------------------------");
-                        ce.printStackTrace();
-                        System.out.println(errorMsg);
-                        System.out.println("-----------------------------------------------------");
-
-                        /*error_text.setText(errorMsg);
-                        error_text.setVisibility(View.VISIBLE);*/
+                        errorMsg = "Error al conectar";
+                        e = ce;
                     }
                     catch (NumberFormatException nfe) {
-                        String errorMsg = "Puerto no válido";
-
-                        System.out.println("-----------------------------------------------------");
-                        //nfe.printStackTrace();
-                        System.out.println(errorMsg);
-                        System.out.println("-----------------------------------------------------");
-
-                        /*error_text.setText(errorMsg);
-                        error_text.setVisibility(View.VISIBLE);*/
-
-                        System.exit(0);
+                        errorMsg = "Puerto no válido";
+                        e = nfe;
                     }
                     catch (IOException ioe) {
-                        String errorMsg = "Error de E/S";
+                        errorMsg = "Error de E/S";
+                        e = ioe;
+                    }
+                    finally {
+                        if (e != null) {
+                            System.out.println("-----------------------------------------------------");
+                            //e.printStackTrace();
+                            System.out.println(errorMsg);
+                            System.out.println("-----------------------------------------------------");
 
-                        System.out.println("-----------------------------------------------------");
-                        //ioe.printStackTrace();
-                        System.out.println(errorMsg);
-                        System.out.println("-----------------------------------------------------");
-
-                        /*error_text.setText(errorMsg);
-                        error_text.setVisibility(View.VISIBLE);*/
-
-                        System.exit(0);
+                            String msg = errorMsg;
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    error_text.setText(msg);
+                                    error_text.setTextColor(getResources().getColor(R.color.red_error, null));
+                                    error_text.setVisibility(View.VISIBLE);
+                                }
+                            });
+                        }
                     }
                 }).start();
             }
             else {
-                error_text.setText("Puerto no válido");
-                error_text.setVisibility(View.VISIBLE);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        error_text.setTextColor(getResources().getColor(R.color.red_error,null));
+                        error_text.setText("Puerto no válido");
+                        error_text.setVisibility(View.VISIBLE);
+                    }
+                });
             }
         }
         else {
-            error_text.setText("Nombre o contraseña inválidos");
-            error_text.setVisibility(View.VISIBLE);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    error_text.setTextColor(getResources().getColor(R.color.red_error,null));
+                    error_text.setText("Nombre o contraseña inválidos");
+                    error_text.setVisibility(View.VISIBLE);
+                }
+            });
         }
     }
 
@@ -213,49 +222,72 @@ public class LoginActivity extends AppCompatActivity {
         int indicando el estado de conexión del cliente.
     */
     public int checkTry(Socket socket) {
-        error_text.setVisibility(View.INVISIBLE);
-        int estado = DISCONNECTED;
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                error_text.setVisibility(View.INVISIBLE);
+            }
+        });
+
+        int estado = STATUS_DISCONNECTED;
+        String errorMsg = "";
+        Exception e = null;
+
         try {
             // Solicitar "hueco" en el servidor
             String mensaje = new DataInputStream(socket.getInputStream()).readUTF();
 
             System.out.println("server response: " + mensaje);
 
-            if (mensaje.equals("------/n##em/p#t_y_")) {			// server full
-                /*error_text.setText("Servidor lleno");
-                error_text.setVisibility(View.VISIBLE);*/
+            if (mensaje.equals(RESPONSE_SERVER_FULL)) {		            // server full
                 System.out.println("server full");
+                errorMsg = "Servidor lleno";
             }
-            else if (mensaje.equals("------***#pass/*word**#")) {	// incorrect password
-                /*error_text.setText("Contraseña incorrecta");
-                error_text.setVisibility(View.VISIBLE);*/
+            else if (mensaje.equals(RESPONSE_INCORRECT_PASSWORD)) {	    // incorrect password
                 System.out.println("incorrect password");
+                errorMsg = "Contraseña incorrecta";
             }
-            else if (mensaje.equals("------un##/r//_/_")) {			// unregistered
-                /*error_text.setText("�Ups!, no estás registrado");
-                error_text.setVisibility(View.VISIBLE);*/
+            else if (mensaje.equals(RESPONSE_UNREGISTERED)) {		    // unregistered
                 System.out.println("unregistered");
+                errorMsg = "¡Ups!, no estás registrado";
             }
-            else if (mensaje.equals("------db/#una/b_#le_")) {		// not access to db
-                /*error_text.setText("Base de datos innacesible");
-                error_text.setVisibility(View.VISIBLE);*/
+            else if (mensaje.equals(RESPONSE_DB_UNABLE_CONNECTION)) {	// not access to db
                 System.out.println("not access to db");
+                errorMsg = "Base de datos innacesible";
             }
-            else if (mensaje.equals("------e#rr//_")) {				// error in login
-                /*error_text.setText("Error al conectar");
-                error_text.setVisibility(View.VISIBLE);*/
+            else if (mensaje.equals(RESPONSE_ERROR)) {				    // error in login
                 System.out.println("error in login");
+                errorMsg = "Error al inciciar sesión";
             }
-            else if (mensaje.equals("------#//u_o/k_#"))			// ok
-                estado = CONNECTED;
-        } catch (IOException ex) {
-            estado = ERROR;
+            else if (mensaje.equals(RESPONSE_OK))			            // ok
+                estado = STATUS_CONNECTED;
 
-            System.out.println("-----------------------------------------------------------");
-            //ex.printStackTrace();
-            System.out.println("error connecting to the server");
-            System.out.println("-----------------------------------------------------------");
+        } catch (IOException ex) {
+            estado = STATUS_ERROR;
+            errorMsg = "error connecting to the server";
+            e = ex;
         }
+        finally {
+            if (errorMsg.length() > 0) {
+                if (e != null) {
+                    System.out.println("-----------------------------------------------------------");
+                    //e.printStackTrace();
+                    System.out.println(errorMsg);
+                    System.out.println("-----------------------------------------------------------");
+                }
+
+                String msg = errorMsg;
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        error_text.setTextColor(getResources().getColor(R.color.red_error, null));
+                        error_text.setText(msg);
+                        error_text.setVisibility(View.VISIBLE);
+                    }
+                });
+            }
+        }
+
         return estado;
     }
 

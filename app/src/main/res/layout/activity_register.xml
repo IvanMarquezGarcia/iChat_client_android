@@ -8,28 +8,12 @@
     tools:context=".RegisterActivity">
 
     <EditText
-        android:id="@+id/register_full_name_edittext"
-        android:layout_width="255dp"
-        android:layout_height="48dp"
-        android:layout_marginTop="52dp"
-        android:autofillHints=""
-        android:ems="10"
-        android:fontFamily="monospace"
-        android:hint="@string/es_full_name"
-        android:inputType="text"
-        android:textColor="@color/white"
-        android:textColorHint="@color/gray_light"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <EditText
         android:id="@+id/register_username_edittext"
         android:layout_width="255dp"
         android:layout_height="48dp"
-        android:layout_marginTop="136dp"
+        android:layout_marginTop="90dp"
         android:autofillHints=""
+        android:backgroundTint="@color/gray_light"
         android:ems="10"
         android:fontFamily="monospace"
         android:hint="@string/es_username"
@@ -37,7 +21,6 @@
         android:textColor="@color/white"
         android:textColorHint="@color/gray_light"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -47,13 +30,13 @@
         android:layout_height="48dp"
         android:layout_marginTop="40dp"
         android:autofillHints=""
+        android:backgroundTint="@color/gray_light"
         android:ems="10"
         android:fontFamily="monospace"
         android:hint="@string/es_password"
         android:inputType="textPassword"
         android:textColorHint="#ABABAB"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/register_username_edittext" />
 
@@ -61,15 +44,15 @@
         android:id="@+id/register_confirm_password_edittextpassword"
         android:layout_width="255dp"
         android:layout_height="48dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="40dp"
         android:autofillHints=""
+        android:backgroundTint="@color/gray_light"
         android:ems="10"
         android:fontFamily="monospace"
         android:hint="@string/es_confirm_password"
         android:inputType="textPassword"
         android:textColorHint="#ABABAB"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/register_password_edittextpassword" />
 
@@ -77,7 +60,7 @@
         android:id="@+id/register_imageButton"
         android:layout_width="70dp"
         android:layout_height="70dp"
-        android:layout_marginBottom="84dp"
+        android:layout_marginBottom="80dp"
         android:backgroundTint="#00FFFFFF"
         android:contentDescription="@string/es_login"
         android:onClick="register"
@@ -87,5 +70,16 @@
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:srcCompat="@android:drawable/ic_menu_send" />
+
+    <Spinner
+        android:id="@+id/register_spinner_lang"
+        style="@style/Widget.AppCompat.Spinner.Underlined"
+        android:layout_width="255dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="40dp"
+        android:backgroundTint="@color/gray_light"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/register_confirm_password_edittextpassword" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

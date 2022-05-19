@@ -12,11 +12,10 @@ import java.util.HashMap;
 
 public class RegisterActivity extends AppCompatActivity {
 
-    private EditText fullname;
     private EditText username;
     private EditText password;
     private EditText confirm_password;
-    private ImageButton register_textview;
+    private ImageButton register_imagebutton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,7 +23,6 @@ public class RegisterActivity extends AppCompatActivity {
         setContentView(R.layout.activity_register);
 
         // Initialize components
-        fullname = findViewById(R.id.register_full_name_edittext);
         username = findViewById(R.id.register_username_edittext);
         password = findViewById(R.id.register_password_edittextpassword);
         confirm_password = findViewById(R.id.register_confirm_password_edittextpassword);
@@ -32,12 +30,6 @@ public class RegisterActivity extends AppCompatActivity {
 
     private HashMap<String, Boolean> checkInput() {
         HashMap<String, Boolean> checks = new HashMap<String, Boolean>();
-
-        if (fullname.getText().toString().length() > 0 &&
-                !fullname.getText().toString().matches("regex"))
-            checks.put("fullname", false);
-        else
-            checks.put("fullname", true);
 
         checks.put("username", username.getText().toString().matches("regex"));
 
