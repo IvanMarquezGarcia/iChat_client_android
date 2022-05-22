@@ -1,8 +1,5 @@
 package com.ivan.iChat.ichat_android;
 
-import static com.ivan.iChat.ichat_android.utils.Constants.RESPONSE_DB_UNABLE_CONNECTION;
-import static com.ivan.iChat.ichat_android.utils.Constants.RESPONSE_ERROR;
-import static com.ivan.iChat.ichat_android.utils.Constants.RESPONSE_OK;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -20,6 +17,9 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import static com.ivan.iChat.ichat_android.utils.Constants.*;
+
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -138,11 +138,14 @@ public class RegisterActivity extends AppCompatActivity {
                     new DataOutputStream(s.getOutputStream()).writeUTF(request);
                     response = new DataInputStream(s.getInputStream()).readUTF();
 
-                    if (response.equals(RESPONSE_OK))
+                    if (response.equals(RESPONSE_OK))                           // logup complete
                         response += " - logged";
-                    else if (response.equals(RESPONSE_DB_UNABLE_CONNECTION))
+                    else if (response.equals(ALREADY_EXISTS)) {					// username already exists
+                        response += " - already exists";
+                    }
+                    else if (response.equals(RESPONSE_DB_UNABLE_CONNECTION))    // database is not accessible
                         response += " - unable access to db";
-                    else if (response.equals(RESPONSE_ERROR))
+                    else if (response.equals(RESPONSE_ERROR))                   // error in logup
                         response += " - error";
                     else
                         response += " - not idea";

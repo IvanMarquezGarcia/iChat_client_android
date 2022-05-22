@@ -11,6 +11,7 @@ public class Constants {
     // Internal Messages:
     // For login and logup
     public static final String RESPONSE_OK =                   "------#//u_o/k_#";
+    public static final String ALREADY_EXISTS = 	           "------/alr__e#xists##";
     public static final String RESPONSE_INCORRECT_PASSWORD =   "------***#pass/*word**#";
     public static final String RESPONSE_UNREGISTERED =         "------un##/r//_/_";
     public static final String RESPONSE_DB_UNABLE_CONNECTION = "------db/#una/b_#le_";
