@@ -26,7 +26,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
-        android:id="@+id/login_host_edittext"
+        android:id="@+id/login_dev_host_edittext"
         android:layout_width="wrap_content"
         android:layout_height="48dp"
         android:layout_marginTop="28dp"
@@ -99,7 +99,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="100dp"
-        android:onClick="open_register"
         android:text="@string/es_register"
         android:textColor="@color/red_error"
         android:visibility="invisible"

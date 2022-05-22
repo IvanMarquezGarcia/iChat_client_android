@@ -7,6 +7,57 @@
     android:background="@color/gray_dark"
     tools:context=".RegisterActivity">
 
+    <TextView
+        android:id="@+id/register_error_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="52dp"
+        android:text="Error al registrar"
+        android:textColor="@color/red_error"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/register_lang_spinner" />
+
+    <Button
+        android:id="@+id/register_dev_button"
+        style="@style/Widget.AppCompat.Button"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="12dp"
+        android:fontFamily="monospace"
+        android:onClick="activate_dev"
+        android:text=">_"
+        android:textAlignment="center"
+        android:textColor="@color/gray_dark"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:typeface="monospace"
+        android:visibility="visible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/register_dev_host_edittext"
+        android:layout_width="255dp"
+        android:layout_height="48dp"
+        android:layout_marginBottom="20dp"
+        android:autofillHints=""
+        android:backgroundTint="@color/gray_light"
+        android:ems="10"
+        android:fontFamily="monospace"
+        android:hint="host"
+        android:inputType="text"
+        android:textColor="@color/white"
+        android:textColorHint="@color/gray_light"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/register_imageButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent" />
+
     <EditText
         android:id="@+id/register_username_edittext"
         android:layout_width="255dp"
@@ -41,7 +92,7 @@
         app:layout_constraintTop_toBottomOf="@+id/register_username_edittext" />
 
     <EditText
-        android:id="@+id/register_confirm_password_edittextpassword"
+        android:id="@+id/register_password_edittextpassword2"
         android:layout_width="255dp"
         android:layout_height="48dp"
         android:layout_marginTop="40dp"
@@ -72,14 +123,15 @@
         app:srcCompat="@android:drawable/ic_menu_send" />
 
     <Spinner
-        android:id="@+id/register_spinner_lang"
+        android:id="@+id/register_lang_spinner"
         style="@style/Widget.AppCompat.Spinner.Underlined"
         android:layout_width="255dp"
         android:layout_height="48dp"
         android:layout_marginTop="40dp"
         android:backgroundTint="@color/gray_light"
+        android:contentDescription="select your prefer language"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/register_confirm_password_edittextpassword" />
+        app:layout_constraintTop_toBottomOf="@+id/register_password_edittextpassword2" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

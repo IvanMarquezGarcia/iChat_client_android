@@ -54,7 +54,7 @@ public class LoginActivity extends AppCompatActivity {
         register_textview = findViewById(R.id.login_register_textView);
         error_text = findViewById(R.id.login_error_textView);
         dev_button = findViewById(R.id.login_dev_button);
-        dev_host = findViewById(R.id.login_host_edittext);
+        dev_host = findViewById(R.id.login_dev_host_edittext);
     }
 
     public void open_register(View view) {
@@ -73,18 +73,6 @@ public class LoginActivity extends AppCompatActivity {
         if (username_edittext.getText().toString().trim().length() <= 0)
             checks.put("password", false);
 
-        /*
-        for logup
-            username requirements:
-                three letters at least
-                no numbers
-            password requirements:
-                longer than 6 chars
-                one number and letter
-                at least
-        checks.put("username", username_edittext.getText().toString().matches("^[A-z]{3,}$"));
-        checks.put("password", password_edittext.getText().toString().matches("^([A-z0-9]+){6,}$"));
-        */
         return checks;
     }
 
@@ -115,7 +103,7 @@ public class LoginActivity extends AppCompatActivity {
                     Exception e = null;
                     try {
                         // for the lambda capturing standard //
-                        String host = "192.168.1.50";
+                        String host = "192.168.1.37";
                         if (dev_host.getVisibility() == View.VISIBLE)
                             host = dev_host.getText().toString().trim();
 

@@ -12,5 +12,6 @@
     <color name="gray_medium">#FF454545</color>
     <color name="gray_dark">#FF2D2D2D</color>
     <color name="black">#FF000000</color>
+    <color name="ok_green">#FF009900</color>
     <color name="red_error">#FFFF4444</color>
 </resources>
