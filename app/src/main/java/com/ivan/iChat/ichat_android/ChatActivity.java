@@ -89,6 +89,21 @@ public class ChatActivity extends AppCompatActivity {
             System.out.println("La escucha ya está habilitada");
     }
 
+    @Override
+    public void onBackPressed() { // check if goes to login by default
+        try {
+            SingletonSocket.getInstance().close();
+            System.out.println("El socket se ha cerrado");
+        } catch(IOException ioe) {
+            System.out.println("---------------------------------------------------------------------");
+            //ioe.printStackTrace();
+            System.out.println("Error al cerrar el socket");
+            System.out.println("---------------------------------------------------------------------");
+        }
+
+        return;
+    }
+
     public void send(View view) {
         error_text.setVisibility(View.INVISIBLE);
         if (connectionStatus == STATUS_CONNECTED) {
