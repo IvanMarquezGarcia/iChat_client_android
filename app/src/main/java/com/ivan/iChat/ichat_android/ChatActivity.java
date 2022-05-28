@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.net.Socket;
 
 import com.ivan.iChat.ichat_android.model.ReaderRunnable;
-import com.ivan.iChat.ichat_android.model.SingletonSocket;
+import com.ivan.iChat.ichat_android.model.UserSocket;
 
 
 public class ChatActivity extends AppCompatActivity {
@@ -41,7 +41,7 @@ public class ChatActivity extends AppCompatActivity {
         // initialize components
         username = getIntent().getStringExtra("username");
         ((TextView) findViewById(R.id.chat_username_textview)).setText(username);
-        socket = SingletonSocket.getInstance();
+        socket = UserSocket.getInstance();
         try {
             output = new DataOutputStream(socket.getOutputStream());
         } catch (IOException e) {
@@ -98,8 +98,8 @@ public class ChatActivity extends AppCompatActivity {
                 output.writeUTF(SEND_BYE);
 
                 // close the socket
-                SingletonSocket.getInstance().close();
-                if (SingletonSocket.getInstance().isClosed())
+                UserSocket.getInstance().close();
+                if (UserSocket.getInstance().isClosed())
                     System.out.println("the client socket has been closed");
                 else
                     System.out.println("cant close the socket");

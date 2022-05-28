@@ -19,7 +19,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.ivan.iChat.ichat_android.model.SingletonSocket;
+import com.ivan.iChat.ichat_android.model.UserSocket;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -127,7 +127,7 @@ public class LoginActivity extends AppCompatActivity {
                         if (checkTry(socket) == STATUS_CONNECTED) {
                             Intent i = new Intent(this, ChatActivity.class);
                             i.putExtra("username", username);
-                            SingletonSocket.setInstance(socket);
+                            UserSocket.setInstance(socket);
                             startActivity(i);
                         }
                     }

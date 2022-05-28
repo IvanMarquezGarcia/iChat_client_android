@@ -3,7 +3,7 @@ package com.ivan.iChat.ichat_android.model;
 import java.io.IOException;
 import java.net.Socket;
 
-public class SingletonSocket {
+public class UserSocket {
     private static Socket INSTANCE = null;
 
     /*// Private constructor suppresses
