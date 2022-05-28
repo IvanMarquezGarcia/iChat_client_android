@@ -1,9 +1,6 @@
 package com.ivan.iChat.ichat_android;
 
 
-/*import static com.ivan.iChat.ichat_android.utils.Constants.STATUS_CONNECTED;
-import static com.ivan.iChat.ichat_android.utils.Constants.STATUS_DISCONNECTED;
-import static com.ivan.iChat.ichat_android.utils.Constants.STATUS_ERROR;*/
 import static com.ivan.iChat.ichat_android.utils.Constants.*;
 
 import androidx.appcompat.app.AppCompatActivity;

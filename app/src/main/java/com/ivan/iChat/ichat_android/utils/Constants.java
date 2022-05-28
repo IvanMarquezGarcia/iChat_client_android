@@ -20,5 +20,7 @@ public class Constants {
     // For comunication
     public static final String SEND_BYE =                      "---//_/_#b#y#e#_!/_";
     public static final String SERVER_DISCONNECTION =          "------//_/_#s#b#y#e#s#_!/_";
+    public static final int MESSAGE_OUT =                      0;
+    public static final int MESSAGE_IN =                       1;
 
 }

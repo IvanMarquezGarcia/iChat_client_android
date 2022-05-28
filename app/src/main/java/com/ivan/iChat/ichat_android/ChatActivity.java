@@ -5,6 +5,7 @@ import static com.ivan.iChat.ichat_android.utils.Constants.SEND_BYE;
 import static com.ivan.iChat.ichat_android.utils.Constants.STATUS_CONNECTED;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
@@ -17,9 +18,12 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import java.net.Socket;
+import java.util.ArrayList;
 
+import com.ivan.iChat.ichat_android.model.Message;
 import com.ivan.iChat.ichat_android.model.ReaderRunnable;
 import com.ivan.iChat.ichat_android.model.UserSocket;
+import com.ivan.iChat.ichat_android.utils.MssgsAdapter;
 
 
 public class ChatActivity extends AppCompatActivity {
@@ -31,6 +35,7 @@ public class ChatActivity extends AppCompatActivity {
     private TextView error_text;
     private EditText input;
     private RecyclerView mssgsList;
+    private ArrayList<Message> messages = new ArrayList<>();
     private Thread readerThread;
 
     @Override
@@ -42,16 +47,17 @@ public class ChatActivity extends AppCompatActivity {
         username = getIntent().getStringExtra("username");
         ((TextView) findViewById(R.id.chat_username_textview)).setText(username);
         socket = UserSocket.getInstance();
-        try {
-            output = new DataOutputStream(socket.getOutputStream());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        try { output = new DataOutputStream(socket.getOutputStream()); }
+        catch (IOException e) { e.printStackTrace(); }
         connectionStatus = STATUS_CONNECTED;
         error_text = findViewById(R.id.chat_error_textview);
         input = findViewById(R.id.chat_input_edittext);
         mssgsList = findViewById(R.id.chat_mssgs_recyclerview);
+        mssgsList.setLayoutManager(new LinearLayoutManager(this));
+        MssgsAdapter mssgsAdapter = new MssgsAdapter(messages);
+        mssgsList.setAdapter(mssgsAdapter);
         readerThread = new Thread(new ReaderRunnable(this));
+        startReader();
     }
 
     public int getConnectionStatus() {
@@ -79,15 +85,25 @@ public class ChatActivity extends AppCompatActivity {
         return error_text;
     }
 
+    public ArrayList<Message> getMessages() {
+        return messages;
+    }
+
+    public MssgsAdapter getMssgsAdapter() {
+        return (MssgsAdapter) getMssgsList().getAdapter();
+    }
+
     public RecyclerView getMssgsList() {
         return mssgsList;
     }
 
     private void startReader() {
-        if (!readerThread.isAlive())
+        if (!readerThread.isAlive()) {
             readerThread.start();
+            System.out.println("the listening has been initialize");
+        }
         else
-            System.out.println("La escucha ya está habilitada");
+            System.out.println("the listening is already working");
     }
 
     @Override
@@ -113,21 +129,19 @@ public class ChatActivity extends AppCompatActivity {
                 System.out.println("---------------------------------------------------------------------");
             }
         }).start();
-
-        return;
     }
 
     public void send(View view) {
         error_text.setVisibility(View.INVISIBLE);
         if (connectionStatus == STATUS_CONNECTED) {
-            String mssg = input.getText().toString().trim();
+            String message = input.getText().toString().trim();
 
-            if (mssg.length() > 0) {
+            if (message.length() > 0) {
                 // send mssg to server
                 if (output != null) {
                     new Thread(() -> {
                         try {
-                            output.writeUTF("[" + username + "] > " + mssg + "");
+                            output.writeUTF("[" + username + "] > " + message + "");
                             output.flush(); // Clear output stream
                         } catch(IOException ioe) {
                             String errorMsg = "Error al enviar mensaje";
@@ -147,8 +161,14 @@ public class ChatActivity extends AppCompatActivity {
                 else {
                     System.out.println("Flujo de salida nulo");
                 }
-                /*mensajes_ListView.getItems().add(new Mensaje(mensaje + " < [Tú]", true));
-                mensajes_ListView.scrollTo(mensajes_ListView.getItems().size() - 1);*/
+                messages.add(new Message(message + " < [Tú]", true));
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        getMssgsAdapter().notifyDataSetChanged();
+                        mssgsList.scrollToPosition(mssgsList.getAdapter().getItemCount() - 1);
+                    }
+                });
             }
         }
     }

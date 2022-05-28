@@ -17,6 +17,7 @@ package com.ivan.iChat.ichat_android.model;
 
 
 import android.view.View;
+import android.widget.TextView;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -24,13 +25,12 @@ import java.io.IOException;
 import java.net.SocketException;
 
 import com.ivan.iChat.ichat_android.ChatActivity;
+import com.ivan.iChat.ichat_android.R;
+
+import static com.ivan.iChat.ichat_android.utils.Constants.*;
 
 
 public class ReaderRunnable implements Runnable {
-	
-	private final int CONNECTED = 1;
-	private final int DISCONNECTED = 0;
-	private final int ERROR = -1;
 	
 	private ChatActivity chatActivity;
 	private DataInputStream input;
@@ -80,32 +80,47 @@ public class ReaderRunnable implements Runnable {
         		chatActivity.getErrorText().setVisibility(View.VISIBLE);
         }
     	
-        while (chatActivity.getConnectionStatus() == CONNECTED && correcto == true) {
+        while (chatActivity.getConnectionStatus() == STATUS_CONNECTED && correcto == true) {
         	// Setear mensaje por defecto y ocultar errorText
-			chatActivity.getErrorText().setVisibility(View.INVISIBLE);
-        	chatActivity.getErrorText().setText("Error de conexión");
+			chatActivity.runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					chatActivity.getErrorText().setVisibility(View.INVISIBLE);
+					chatActivity.getErrorText().setText("Error de conexión");
+				}
+			});
 
             // recibir del servidor
-            String mensaje = null;
+            String message = null;
             try {
-            	mensaje = input.readUTF();
+            	message = input.readUTF();
             	
             	// Si el servidor est� lleno
-            	if (mensaje.equals("S_lleno_#no#mas#peticiones#_")) {
-            		chatActivity.getErrorText().setText("Servidor lleno");
-					chatActivity.getErrorText().setVisibility(View.VISIBLE);
+            	if (message.equals("S_lleno_#no#mas#peticiones#_")) {
+					chatActivity.runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+							chatActivity.getErrorText().setText("Servidor lleno");
+							chatActivity.getErrorText().setVisibility(View.VISIBLE);
+						}
+					});
             		
-            		mensaje = null;
+            		message = null;
             		
             		desconectar();
             	}
             	
             	// Si el servidor se ha desconectado
-            	if (mensaje.equals("------//_/_#s#b#y#e#s#_!/_")) {
-            		chatActivity.getErrorText().setText("Servidor desconectado");
-					chatActivity.getErrorText().setVisibility(View.VISIBLE);
+            	if (message.equals("------//_/_#s#b#y#e#s#_!/_")) {
+					chatActivity.runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+							chatActivity.getErrorText().setText("Servidor desconectado");
+							chatActivity.getErrorText().setVisibility(View.VISIBLE);
+						}
+					});
             		
-					mensaje = null;
+					message = null;
 					
 					desconectar();
             	}
@@ -129,10 +144,16 @@ public class ReaderRunnable implements Runnable {
             }
 
             // Si el mensaje no es nulo, mostrarlo
-            if (mensaje != null) {
-            	System.out.println(mensaje);
-                /*chatActivity.getMssgsList().getItems().add(new Mensaje(msg, false));
-                chatActivity.getMssgsList().scrollTo(chatActivity.getMssgsList()..getItems().size() - 1);*/
+            if (message != null) {
+            	System.out.println(message);
+                chatActivity.getMessages().add(new Message(message, false));
+				chatActivity.runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						chatActivity.getMssgsAdapter().notifyDataSetChanged();
+						chatActivity.getMssgsList().scrollToPosition(chatActivity.getMssgsList().getAdapter().getItemCount() - 1);
+					}
+				});
             }
         }
     }
@@ -147,7 +168,7 @@ public class ReaderRunnable implements Runnable {
 		del cliente y el propio socket 
 	 */
 	public int desconectar() {
-		int status = CONNECTED;
+		int status = STATUS_CONNECTED;
 		try {
 			// Indicar desconexi�n al servidor
 			chatActivity.getOutput().writeUTF("|/\\\\/\\//\\|");
@@ -163,7 +184,7 @@ public class ReaderRunnable implements Runnable {
 				chatActivity.getSocket().close();
 			}
 
-			status = DISCONNECTED;
+			status = STATUS_DISCONNECTED;
 		}
 		catch(SocketException se) {
 			System.out.println("-----------------------------------------------------------");
@@ -171,10 +192,10 @@ public class ReaderRunnable implements Runnable {
 			System.out.println("La comunicaci�n con el servidor se ha interrumpido.");
 			System.out.println("-----------------------------------------------------------");
 
-			status = DISCONNECTED;
+			status = STATUS_DISCONNECTED;
 		}
 		catch(IOException ioe) {
-			status = ERROR;
+			status = STATUS_ERROR;
 
 			System.out.println("-----------------------------------------------------------");
 			//ioe.printStackTrace();

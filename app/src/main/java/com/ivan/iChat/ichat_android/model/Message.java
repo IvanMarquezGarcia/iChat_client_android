@@ -21,28 +21,28 @@ package com.ivan.iChat.ichat_android.model;
 
 
 
-public class Mensaje {
+public class Message {
 	
-	String contenido;
-	boolean propio;
+	String content;
+	boolean own;
 	
 	
-	public Mensaje(String contenido) {
-		this(contenido, false);
+	public Message(String content) {
+		this(content, false);
 	}
 	
-	public Mensaje(String contenido, boolean propio) {
-		this.contenido = contenido;
-		this.propio = propio;
-	}
-
-	
-	public String getContenido() {
-		return contenido;
+	public Message(String content, boolean own) {
+		this.content = content;
+		this.own = own;
 	}
 
-	public boolean isPropio() {
-		return propio;
+	
+	public String getContent() {
+		return content;
+	}
+
+	public boolean isOwn() {
+		return own;
 	}
 	
 }
