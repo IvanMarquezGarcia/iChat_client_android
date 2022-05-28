@@ -36,6 +36,7 @@
         android:fontFamily="monospace"
         android:hint="host"
         android:inputType="text"
+        android:text="192.168.1."
         android:textColor="@color/white"
         android:textColorHint="@color/gray_light"
         android:visibility="invisible"

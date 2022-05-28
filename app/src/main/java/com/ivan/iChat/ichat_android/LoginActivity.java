@@ -259,7 +259,7 @@ public class LoginActivity extends AppCompatActivity {
             if (errorMsg.length() > 0) {
                 if (e != null) {
                     System.out.println("-----------------------------------------------------------");
-                    //e.printStackTrace();
+                    e.printStackTrace();
                     System.out.println(errorMsg);
                     System.out.println("-----------------------------------------------------------");
                 }

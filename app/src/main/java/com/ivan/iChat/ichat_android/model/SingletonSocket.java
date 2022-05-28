@@ -31,12 +31,8 @@ public class SingletonSocket {
     }*/
 
     // Synchronized creator to prevent posibles multi-thread problems
-    public synchronized static boolean setInstance(Socket socket) {
-        if (INSTANCE == null) {
-            INSTANCE = socket;
-            return true;
-        }
-        return false;
+    public synchronized static void setInstance(Socket socket) {
+        INSTANCE = socket;
     }
 
     public static Socket getInstance() {

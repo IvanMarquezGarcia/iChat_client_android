@@ -1,6 +1,7 @@
 package com.ivan.iChat.ichat_android;
 
 
+import static com.ivan.iChat.ichat_android.utils.Constants.SEND_BYE;
 import static com.ivan.iChat.ichat_android.utils.Constants.STATUS_CONNECTED;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -91,15 +92,27 @@ public class ChatActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() { // check if goes to login by default
-        try {
-            SingletonSocket.getInstance().close();
-            System.out.println("El socket se ha cerrado");
-        } catch(IOException ioe) {
-            System.out.println("---------------------------------------------------------------------");
-            //ioe.printStackTrace();
-            System.out.println("Error al cerrar el socket");
-            System.out.println("---------------------------------------------------------------------");
-        }
+        new Thread(() -> {
+            try {
+                // send bye to server
+                output.writeUTF(SEND_BYE);
+
+                // close the socket
+                SingletonSocket.getInstance().close();
+                if (SingletonSocket.getInstance().isClosed())
+                    System.out.println("the client socket has been closed");
+                else
+                    System.out.println("cant close the socket");
+
+                // go back to login
+                finish();
+            } catch(IOException ioe) {
+                System.out.println("---------------------------------------------------------------------");
+                //ioe.printStackTrace();
+                System.out.println("Error al cerrar el socket");
+                System.out.println("---------------------------------------------------------------------");
+            }
+        }).start();
 
         return;
     }
