@@ -12,18 +12,21 @@ import com.ivan.iChat.ichat_android.R;
 
 import java.util.ArrayList;
 
-import com.ivan.iChat.ichat_android.model.Message;
+import com.ivan.iChat.ichat_android.model.Mensaje;
+import com.ivan.iChat.ichat_android.model.User;
 
 import static com.ivan.iChat.ichat_android.utils.Constants.*;
 
 
 public class MssgsAdapter extends RecyclerView.Adapter<MssgsAdapter.ViewHolder> {
 
-    private ArrayList<Message> messages;
+    private ArrayList<Mensaje> messages;
+    private User user;
     private static int text_view_id;
 
-    public MssgsAdapter(ArrayList<Message> messages) {
+    public MssgsAdapter(ArrayList<Mensaje> messages, User user) {
         this.messages = messages;
+        this.user = user;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -52,13 +55,17 @@ public class MssgsAdapter extends RecyclerView.Adapter<MssgsAdapter.ViewHolder> 
 
     @Override
     public int getItemViewType(int position) {
-        if (messages.get(position).isOwn()) return MESSAGE_OUT;
+
+        if (messages.get(position).getSender() == user.getId()) return MESSAGE_OUT;
         else return MESSAGE_IN;
     }
 
-    @Override // Replace de contents of a View/item (invoked by the layout manager)
+    @Override // Replace the content of a View/item (invoked by the layout manager)
     public void onBindViewHolder(ViewHolder holder, int position) {
-        holder.messageTextView.setText(messages.get(position).getContent());
+        if (holder.getItemViewType() == MESSAGE_OUT)
+            holder.messageTextView.setText(messages.get(position).getContenido());
+        else
+            holder.messageTextView.setText(messages.get(position).getSender() + " > " + messages.get(position).getContenido());
     }
 
     @Override

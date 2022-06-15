@@ -17,6 +17,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.ivan.iChat.ichat_android.model.UserSocket;
+import com.ivan.iChat.ichat_android.utils.Core;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -59,6 +60,7 @@ public class LoginActivity extends AppCompatActivity {
         startActivity(i);
     }
 
+    // REMOVE
     public HashMap<String, Boolean> checkInput() {
         HashMap<String, Boolean> checks = new HashMap<String, Boolean>();
         checks.put("username", true);
@@ -99,8 +101,7 @@ public class LoginActivity extends AppCompatActivity {
                     String errorMsg = "";
                     Exception e = null;
                     try {
-                        // for the lambda capturing standard //
-                        String host = "192.168.1.37";
+                        String host = "192.168.1.47";
                         if (dev_host.getVisibility() == View.VISIBLE)
                             host = dev_host.getText().toString().trim();
 
@@ -119,11 +120,11 @@ public class LoginActivity extends AppCompatActivity {
 
                         System.out.println(strData); // texto de control
 
-                        System.out.println("-------" + username + "-------");
-
-                        if (checkTry(socket) == STATUS_CONNECTED) {
+                        data = sendLogin(socket);
+                        if (data.get("code").equals(RESPONSE_OK)) {
                             Intent i = new Intent(this, ChatActivity.class);
-                            i.putExtra("username", username);
+                            data.remove("code");
+                            i.putExtra("userData", data.toString());
                             UserSocket.setInstance(socket);
                             startActivity(i);
                         }
@@ -206,7 +207,7 @@ public class LoginActivity extends AppCompatActivity {
     RETORNO:
         int indicando el estado de conexión del cliente.
     */
-    public int checkTry(Socket socket) {
+    public HashMap<String, String> sendLogin(Socket socket) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -214,41 +215,41 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        int estado = STATUS_DISCONNECTED;
+        HashMap<String, String> response = null;
         String errorMsg = "";
         Exception e = null;
 
         try {
             // Solicitar "hueco" en el servidor
-            String mensaje = new DataInputStream(socket.getInputStream()).readUTF();
+            response = Core.strToHashMap(new DataInputStream(socket.getInputStream()).readUTF());
 
-            System.out.println("server response: " + mensaje);
+            System.out.println("server response: " + response.get("code"));
 
-            if (mensaje.equals(RESPONSE_SERVER_FULL)) {		            // server full
+            if (response.get("code").equals(RESPONSE_SERVER_FULL)) {		        // server full
                 System.out.println("server full");
                 errorMsg = "Servidor lleno";
             }
-            else if (mensaje.equals(RESPONSE_INCORRECT_PASSWORD)) {	    // incorrect password
+            else if (response.get("code").equals(RESPONSE_INCORRECT_PASSWORD)) {	// incorrect password
                 System.out.println("incorrect password");
                 errorMsg = "Contraseña incorrecta";
             }
-            else if (mensaje.equals(RESPONSE_UNREGISTERED)) {		    // unregistered
+            else if (response.get("code").equals(RESPONSE_UNREGISTERED)) {		    // unregistered
                 System.out.println("unregistered");
                 errorMsg = "¡Ups!, no estás registrado";
             }
-            else if (mensaje.equals(RESPONSE_DB_UNABLE_CONNECTION)) {	// not access to db
+            else if (response.get("code").equals(RESPONSE_DB_UNABLE_CONNECTION)) {	// not access to db
                 System.out.println("not access to db");
                 errorMsg = "Base de datos innacesible";
             }
-            else if (mensaje.equals(RESPONSE_ERROR)) {				    // error in login
+            else if (response.get("code").equals(RESPONSE_ERROR)) {				    // error in login
                 System.out.println("error in login");
-                errorMsg = "Error al inciciar sesión";
+                errorMsg = "Error al iniciar sesión";
             }
-            else if (mensaje.equals(RESPONSE_OK))			            // ok
-                estado = STATUS_CONNECTED;
+            else if (response.get("code").equals(RESPONSE_OK)) {                        // ok
+            }
 
         } catch (IOException ex) {
-            estado = STATUS_ERROR;
+            response.put("code", RESPONSE_ERROR);
             errorMsg = "error connecting to the server";
             e = ex;
         }
@@ -273,7 +274,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         }
 
-        return estado;
+        return response;
     }
 
 }

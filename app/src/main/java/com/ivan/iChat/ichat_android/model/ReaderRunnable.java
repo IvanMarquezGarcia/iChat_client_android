@@ -17,15 +17,12 @@ package com.ivan.iChat.ichat_android.model;
 
 
 import android.view.View;
-import android.widget.TextView;
 
-import java.io.DataInputStream;
 import java.io.IOException;
 
 import java.net.SocketException;
 
 import com.ivan.iChat.ichat_android.ChatActivity;
-import com.ivan.iChat.ichat_android.R;
 
 import static com.ivan.iChat.ichat_android.utils.Constants.*;
 
@@ -33,16 +30,11 @@ import static com.ivan.iChat.ichat_android.utils.Constants.*;
 public class ReaderRunnable implements Runnable {
 	
 	private ChatActivity chatActivity;
-	private DataInputStream input;
+	private MessageObjectInputStream input;
     
     
     public ReaderRunnable(ChatActivity ca) {
         this.chatActivity = ca;
-        try {
-			input = new DataInputStream(chatActivity.getSocket().getInputStream());
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
     }
 
     
@@ -61,7 +53,8 @@ public class ReaderRunnable implements Runnable {
     	
     	try {
 	        // Iniciar flujo de entrada
-	    	input = new DataInputStream(chatActivity.getSocket().getInputStream());
+	    	input = new MessageObjectInputStream(chatActivity.getSocket().getInputStream());
+	    	System.out.println("input created"); // debbug
     	}
     	catch (IOException ex) {
     		correcto = false;
@@ -74,10 +67,15 @@ public class ReaderRunnable implements Runnable {
         		//ex.printStackTrace();
         		System.out.println(errorMsg);
         		System.out.println("-----------------------------------------------------------");
-        		
-        		
-        		chatActivity.getErrorText().setText(errorMsg);
-        		chatActivity.getErrorText().setVisibility(View.VISIBLE);
+
+			String temp = errorMsg;
+			chatActivity.runOnUiThread(new Runnable() {
+        			@Override
+					public void run() {
+						chatActivity.getErrorText().setText(temp);
+						chatActivity.getErrorText().setVisibility(View.VISIBLE);
+					}
+				});
         }
     	
         while (chatActivity.getConnectionStatus() == STATUS_CONNECTED && correcto == true) {
@@ -91,12 +89,12 @@ public class ReaderRunnable implements Runnable {
 			});
 
             // recibir del servidor
-            String message = null;
+            Mensaje message = null;
             try {
-            	message = input.readUTF();
+            	message = (Mensaje) input.readObject();
             	
             	// Si el servidor est� lleno
-            	if (message.equals("S_lleno_#no#mas#peticiones#_")) {
+            	if (message.getContenido().equals(RESPONSE_SERVER_FULL)) {
 					chatActivity.runOnUiThread(new Runnable() {
 						@Override
 						public void run() {
@@ -111,7 +109,7 @@ public class ReaderRunnable implements Runnable {
             	}
             	
             	// Si el servidor se ha desconectado
-            	if (message.equals("------//_/_#s#b#y#e#s#_!/_")) {
+            	if (message.equals(SERVER_DISCONNECTION)) {
 					chatActivity.runOnUiThread(new Runnable() {
 						@Override
 						public void run() {
@@ -125,6 +123,14 @@ public class ReaderRunnable implements Runnable {
 					desconectar();
             	}
             }
+			catch (ClassNotFoundException cnfe) {
+				correcto = false;
+
+				System.out.println("-----------------------------------------------------------");
+				//cnfe.printStackTrace();
+				System.out.println("Error al conseguir clase <Mensaje>");
+				System.out.println("-----------------------------------------------------------");
+			}
             catch(SocketException se) {
             	correcto = false;
             	
@@ -143,10 +149,9 @@ public class ReaderRunnable implements Runnable {
             	System.out.println("-----------------------------------------------------------");
             }
 
-            // Si el mensaje no es nulo, mostrarlo
+			// Si el mensaje no es nulo, mostrarlo
             if (message != null) {
-            	System.out.println(message);
-                chatActivity.getMessages().add(new Message(message, false));
+                chatActivity.getMessages().add(message);
 				chatActivity.runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
@@ -171,7 +176,7 @@ public class ReaderRunnable implements Runnable {
 		int status = STATUS_CONNECTED;
 		try {
 			// Indicar desconexi�n al servidor
-			chatActivity.getOutput().writeUTF("|/\\\\/\\//\\|");
+			chatActivity.getOutput().writeObject(SEND_BYE);
 
 			// Desconectar
 			if (chatActivity.getSocket().isInputShutdown() == false)

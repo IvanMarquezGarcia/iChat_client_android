@@ -20,6 +20,8 @@ import java.util.List;
 
 import static com.ivan.iChat.ichat_android.utils.Constants.*;
 
+import com.ivan.iChat.ichat_android.utils.Core;
+
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -112,7 +114,7 @@ public class RegisterActivity extends AppCompatActivity {
     public void sendLogup() {
         String host = devHostEdittext.getText().toString().trim();
         if (host.length() == 0)
-            host = "192.168.1.37";
+            host = "192.168.1.47";
         int port = 1234;
 
         if (usernameEdittext.getText().toString().trim().length() <= 0)
@@ -126,7 +128,7 @@ public class RegisterActivity extends AppCompatActivity {
 
             String hostAux = host;
             new Thread(() -> {
-                String response = "";
+                HashMap<String, String> response = new HashMap<String, String>();
                 try {
                     System.out.println("u are going to connect at " + hostAux + ":" + port);
 
@@ -136,41 +138,55 @@ public class RegisterActivity extends AppCompatActivity {
                     System.out.println(request);
 
                     new DataOutputStream(s.getOutputStream()).writeUTF(request);
-                    response = new DataInputStream(s.getInputStream()).readUTF();
+                    response = Core.strToHashMap(new DataInputStream(s.getInputStream()).readUTF());
 
-                    if (response.equals(RESPONSE_OK))                           // logup complete
-                        response += " - logged";
-                    else if (response.equals(ALREADY_EXISTS)) {					// username already exists
-                        response += " - already exists";
+                    if (response.get("code").equals(RESPONSE_OK))                           // logup complete
+                        response.put("message", "logged");
+                    else if (response.get("code").equals(ALREADY_EXISTS)) {					// username already exists
+                        response.put("message", "already exists");
                     }
-                    else if (response.equals(RESPONSE_DB_UNABLE_CONNECTION))    // database is not accessible
-                        response += " - unable access to db";
-                    else if (response.equals(RESPONSE_ERROR))                   // error in logup
-                        response += " - error";
+                    else if (response.get("code").equals(RESPONSE_DB_UNABLE_CONNECTION))    // database is not accessible
+                        response.put("message", "unable access to db");
+                    else if (response.get("code").equals(RESPONSE_ERROR))                   // error in logup
+                        response.put("message", "error");
                     else
-                        response += " - not idea";
+                        response.put("message", "not idea");
                 } catch(Exception e) {
                     e.printStackTrace();
-                    response += " - " + e.getMessage();
+                    response.put("exception_msg", e.getMessage());
                 }
                 finally {
                     System.out.println("#############################################################################");
-                    System.out.println(response);
+                    System.out.println(response.toString());
                     System.out.println("#############################################################################");
 
-                    String responseAux = response;
+                    HashMap<String, String> auxResponse = response;
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            if (responseAux.contains(RESPONSE_OK)) {
+                            if (auxResponse.get("code").equals(RESPONSE_OK)) {
                                 errorText.setTextColor(getResources().getColor(R.color.ok_green, null));
                                 errorText.setText("Registro completado");
                                 errorText.setVisibility(View.VISIBLE);
                             }
-                            else {
-                                String errorMssg = responseAux.split(" - ")[1];
+                            else if (auxResponse.get("code").equals(ALREADY_EXISTS)) {
                                 errorText.setTextColor(getResources().getColor(R.color.red_error, null));
-                                errorText.setText(errorMssg);
+                                errorText.setText("Ese username ya está registrado");
+                                errorText.setVisibility(View.VISIBLE);
+                            }
+                            else if (auxResponse.get("code").equals(RESPONSE_DB_UNABLE_CONNECTION)) {
+                                errorText.setTextColor(getResources().getColor(R.color.red_error, null));
+                                errorText.setText("Base de datos innacesible");
+                                errorText.setVisibility(View.VISIBLE);
+                            }
+                            else if (auxResponse.get("code").equals(RESPONSE_ERROR)) {
+                                errorText.setTextColor(getResources().getColor(R.color.red_error, null));
+                                errorText.setText("Error al registrar");
+                                errorText.setVisibility(View.VISIBLE);
+                            }
+                            else {
+                                errorText.setTextColor(getResources().getColor(R.color.red_error, null));
+                                errorText.setText("Error inesperado");
                                 errorText.setVisibility(View.VISIBLE);
                             }
                         }
